@@ -52,8 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!-- Pas de menu sur la page connexion — on affiche directement la carte -->
 <div class="login-wrapper">
     <div class="login-card">
-        <h2>🔐 Connexion</h2>
-        <p class="subtitle">Espace réservé aux éditeurs et administrateurs</p>
+        <h2>Connexion</h2>
+        <p class="subtitle">Espace reserve aux editeurs et administrateurs</p>
 
         <?php if ($erreur): ?>
             <div class="alert alert-danger"><?= htmlspecialchars($erreur) ?></div>

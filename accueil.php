@@ -67,8 +67,8 @@ if ($filtre_cat > 0) {
 ?>
 
 <div class="page-hero">
-    <h1>📰 ActuSénégal</h1>
-    <p>L'actualité en temps réel — Technologie, Sport, Politique, Education, Culture</p>
+    <h1>ActuSenegal</h1>
+    <p>L'actualite en temps reel - Technologie, Sport, Politique, Education, Culture</p>
 </div>
 
 <div class="container">
@@ -94,11 +94,11 @@ if ($filtre_cat > 0) {
     <!-- Grille articles -->
     <?php if (empty($articles)): ?>
         <div class="empty-state">
-            <div class="icon">📭</div>
+            <div class="icon">--</div>
             <h3>Aucun article disponible</h3>
-            <p>Il n'y a pas encore d'articles dans cette catégorie.</p>
+            <p>Il n'y a pas encore d'articles dans cette categorie.</p>
             <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="articles/ajouter.php" class="btn btn-primary mt-2">+ Créer le premier article</a>
+                <a href="articles/ajouter.php" class="btn btn-primary mt-2">+ Creer le premier article</a>
             <?php endif; ?>
         </div>
     <?php else: ?>
@@ -110,7 +110,7 @@ if ($filtre_cat > 0) {
                              src="uploads/<?= htmlspecialchars($art['image']) ?>"
                              alt="<?= htmlspecialchars($art['titre']) ?>">
                     <?php else: ?>
-                        <div class="card-img-placeholder">📄</div>
+                        <div class="card-img-placeholder">A</div>
                     <?php endif; ?>
 
                     <div class="card-body">
@@ -126,19 +126,19 @@ if ($filtre_cat > 0) {
                         <p class="card-desc"><?= htmlspecialchars(mb_substr($art['description'], 0, 140)) ?>…</p>
 
                         <div class="card-meta">
-                            <span>✍ <?= htmlspecialchars($art['prenom'] . ' ' . $art['auteur_nom']) ?></span>
-                            <span>🕒 <?= date('d/m/Y', strtotime($art['date_publication'])) ?></span>
+                            <span><?= htmlspecialchars($art['prenom'] . ' ' . $art['auteur_nom']) ?></span>
+                            <span><?= date('d/m/Y', strtotime($art['date_publication'])) ?></span>
                         </div>
 
-                        <!-- Boutons admin/éditeur -->
+                        <!-- Boutons admin/editeur -->
                         <?php if (isset($_SESSION['user_id'])): ?>
                             <div class="card-actions">
                                 <a href="articles/modifier.php?id=<?= (int)$art['id'] ?>"
-                                   class="btn btn-secondary btn-sm">✏ Modifier</a>
+                                   class="btn btn-secondary btn-sm">Modifier</a>
                                 <a href="articles/supprimer.php?id=<?= (int)$art['id'] ?>"
                                    class="btn btn-danger btn-sm confirm-delete"
-                                   data-confirm="Supprimer l'article « <?= htmlspecialchars($art['titre']) ?> » ?">
-                                   🗑 Supprimer</a>
+                                   data-confirm="Supprimer l'article <?= htmlspecialchars($art['titre']) ?> ?">
+                                   Supprimer</a>
                             </div>
                         <?php endif; ?>
                     </div>

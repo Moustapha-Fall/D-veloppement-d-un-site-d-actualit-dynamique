@@ -6,8 +6,7 @@ $base = $base_url ?? '';
 <header class="site-header">
     <div class="header-inner">
         <a href="<?= $base ?>accueil.php" class="site-logo">
-            <span class="logo-icon">📰</span>
-            <span class="logo-text">ActuSénégal</span>
+            <span class="logo-text">ActuSenegal</span>
         </a>
 
         <nav class="main-nav">

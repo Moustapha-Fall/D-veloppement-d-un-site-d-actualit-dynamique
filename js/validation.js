@@ -1,191 +1,336 @@
 /**
- * js/validation.js — Validation côté client de tous les formulaires
- * Projet Backend PHP/MySQL — ESP Dakar
- * Chaque formulaire est identifié par son attribut id unique.
+ * js/validation.js — Validation et interactions des formulaires
+ * Projet ActuSenegal — ESP Dakar
  */
 
 'use strict';
 
-/* ---- Utilitaires ----------------------------------------- */
-function showError(input, message) {
-    input.classList.add('error');
-    let span = input.parentElement.querySelector('.field-error');
-    if (!span) {
-        span = document.createElement('span');
-        span.className = 'field-error';
-        input.parentElement.appendChild(span);
+/* ============================================================
+   UTILITAIRES
+   ============================================================ */
+
+const Utils = {
+    showError(input, message) {
+        input.classList.add('error');
+        let span = input.parentElement.querySelector('.field-error');
+        if (!span) {
+            span = document.createElement('span');
+            span.className = 'field-error';
+            input.parentElement.appendChild(span);
+        }
+        span.textContent = message;
+    },
+
+    clearError(input) {
+        input.classList.remove('error');
+        const span = input.parentElement.querySelector('.field-error');
+        if (span) span.textContent = '';
+    },
+
+    clearAllErrors(form) {
+        form.querySelectorAll('.field-error').forEach(s => s.textContent = '');
+        form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+    },
+
+    isEmpty(value) {
+        return value.trim() === '';
+    },
+
+    formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' octets';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' Ko';
+        return (bytes / (1024 * 1024)).toFixed(2) + ' Mo';
     }
-    span.textContent = message;
-}
+};
 
-function clearError(input) {
-    input.classList.remove('error');
-    const span = input.parentElement.querySelector('.field-error');
-    if (span) span.textContent = '';
-}
+/* ============================================================
+   UPLOAD IMAGE AVEC PREVIEW
+   ============================================================ */
 
-function clearAllErrors(form) {
-    form.querySelectorAll('.field-error').forEach(s => s.textContent = '');
-    form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
-}
+const ImageUpload = {
+    init() {
+        document.querySelectorAll('.upload-zone').forEach(zone => {
+            const input = zone.querySelector('input[type="file"]');
+            const preview = zone.parentElement.querySelector('.upload-preview');
+            
+            if (!input || !preview) return;
 
-function isEmpty(value) {
-    return value.trim() === '';
-}
+            // Drag & drop
+            ['dragenter', 'dragover'].forEach(evt => {
+                zone.addEventListener(evt, e => {
+                    e.preventDefault();
+                    zone.classList.add('dragover');
+                });
+            });
 
-/* ---- Formulaire Connexion --------------------------------- */
-const formConnexion = document.getElementById('formConnexion');
-if (formConnexion) {
-    formConnexion.addEventListener('submit', function (e) {
-        clearAllErrors(this);
-        let valid = true;
+            ['dragleave', 'drop'].forEach(evt => {
+                zone.addEventListener(evt, e => {
+                    e.preventDefault();
+                    zone.classList.remove('dragover');
+                });
+            });
 
-        const login = this.querySelector('#login');
-        const mdp   = this.querySelector('#mot_de_passe');
+            zone.addEventListener('drop', e => {
+                const files = e.dataTransfer.files;
+                if (files.length) {
+                    input.files = files;
+                    this.showPreview(input, preview);
+                }
+            });
 
-        if (isEmpty(login.value)) {
-            showError(login, 'Le login est obligatoire.');
-            valid = false;
+            // Selection fichier
+            input.addEventListener('change', () => {
+                this.showPreview(input, preview);
+            });
+
+            // Bouton supprimer
+            const removeBtn = preview.querySelector('.upload-preview-remove');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', e => {
+                    e.preventDefault();
+                    input.value = '';
+                    preview.classList.remove('show');
+                });
+            }
+        });
+    },
+
+    showPreview(input, preview) {
+        const file = input.files[0];
+        if (!file) return;
+
+        // Verifier le type
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+            alert('Format non supporte. Utilisez JPG, PNG, GIF ou WebP.');
+            input.value = '';
+            return;
         }
 
-        if (isEmpty(mdp.value)) {
-            showError(mdp, 'Le mot de passe est obligatoire.');
-            valid = false;
-        } else if (mdp.value.trim().length < 4) {
-            showError(mdp, 'Le mot de passe doit contenir au moins 4 caractères.');
-            valid = false;
+        // Verifier la taille (2 Mo max)
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Image trop lourde (max 2 Mo).');
+            input.value = '';
+            return;
         }
 
-        if (!valid) e.preventDefault();
-    });
-}
+        // Afficher la preview
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = preview.querySelector('img');
+            const name = preview.querySelector('.upload-preview-name');
+            const size = preview.querySelector('.upload-preview-size');
+            
+            if (img) img.src = e.target.result;
+            if (name) name.textContent = file.name;
+            if (size) size.textContent = Utils.formatFileSize(file.size);
+            
+            preview.classList.add('show');
+        };
+        reader.readAsDataURL(file);
+    }
+};
 
-/* ---- Formulaire Article (Ajouter / Modifier) -------------- */
-const formArticle = document.getElementById('formArticle');
-if (formArticle) {
-    formArticle.addEventListener('submit', function (e) {
-        clearAllErrors(this);
-        let valid = true;
+/* ============================================================
+   FORMULAIRES - VALIDATION
+   ============================================================ */
 
-        const titre       = this.querySelector('#titre');
-        const description = this.querySelector('#description');
-        const contenu     = this.querySelector('#contenu');
-        const categorie   = this.querySelector('#categorie_id');
+const FormValidation = {
+    init() {
+        this.initConnexion();
+        this.initArticle();
+        this.initCategorie();
+        this.initUser();
+        this.initDeleteConfirm();
+        this.initInputClear();
+    },
 
-        if (isEmpty(titre.value)) {
-            showError(titre, 'Le titre est obligatoire.');
-            valid = false;
-        } else if (titre.value.trim().length > 255) {
-            showError(titre, 'Le titre ne peut pas dépasser 255 caractères.');
-            valid = false;
-        }
+    initConnexion() {
+        const form = document.getElementById('formConnexion');
+        if (!form) return;
 
-        if (isEmpty(description.value)) {
-            showError(description, 'La description courte est obligatoire.');
-            valid = false;
-        } else if (description.value.trim().length > 500) {
-            showError(description, 'La description ne peut pas dépasser 500 caractères.');
-            valid = false;
-        }
+        form.addEventListener('submit', function(e) {
+            Utils.clearAllErrors(this);
+            let valid = true;
 
-        if (isEmpty(contenu.value)) {
-            showError(contenu, 'Le contenu est obligatoire.');
-            valid = false;
-        }
+            const login = this.querySelector('#login');
+            const mdp = this.querySelector('#mot_de_passe');
 
-        if (!categorie || categorie.value === '' || categorie.value === '0') {
-            showError(categorie, 'Veuillez sélectionner une catégorie.');
-            valid = false;
-        }
+            if (Utils.isEmpty(login.value)) {
+                Utils.showError(login, 'Le login est obligatoire.');
+                valid = false;
+            }
 
-        if (!valid) e.preventDefault();
-    });
+            if (Utils.isEmpty(mdp.value)) {
+                Utils.showError(mdp, 'Le mot de passe est obligatoire.');
+                valid = false;
+            } else if (mdp.value.trim().length < 4) {
+                Utils.showError(mdp, 'Minimum 4 caracteres.');
+                valid = false;
+            }
 
-    // Compteur de caractères pour le titre
-    const titreInput = formArticle.querySelector('#titre');
-    if (titreInput) {
+            if (!valid) e.preventDefault();
+        });
+    },
+
+    initArticle() {
+        const form = document.getElementById('formArticle');
+        if (!form) return;
+
+        form.addEventListener('submit', function(e) {
+            Utils.clearAllErrors(this);
+            let valid = true;
+
+            const titre = this.querySelector('#titre');
+            const description = this.querySelector('#description');
+            const contenu = this.querySelector('#contenu');
+            const categorie = this.querySelector('#categorie_id');
+
+            if (Utils.isEmpty(titre.value)) {
+                Utils.showError(titre, 'Le titre est obligatoire.');
+                valid = false;
+            } else if (titre.value.trim().length > 255) {
+                Utils.showError(titre, 'Maximum 255 caracteres.');
+                valid = false;
+            }
+
+            if (Utils.isEmpty(description.value)) {
+                Utils.showError(description, 'La description est obligatoire.');
+                valid = false;
+            } else if (description.value.trim().length > 500) {
+                Utils.showError(description, 'Maximum 500 caracteres.');
+                valid = false;
+            }
+
+            if (Utils.isEmpty(contenu.value)) {
+                Utils.showError(contenu, 'Le contenu est obligatoire.');
+                valid = false;
+            }
+
+            if (!categorie || categorie.value === '' || categorie.value === '0') {
+                Utils.showError(categorie, 'Selectionnez une categorie.');
+                valid = false;
+            }
+
+            if (!valid) e.preventDefault();
+        });
+
+        // Compteur caracteres
+        this.addCharCounter(form.querySelector('#titre'), 255);
+        this.addCharCounter(form.querySelector('#description'), 500);
+    },
+
+    initCategorie() {
+        const form = document.getElementById('formCategorie');
+        if (!form) return;
+
+        form.addEventListener('submit', function(e) {
+            Utils.clearAllErrors(this);
+            let valid = true;
+
+            const nom = this.querySelector('#nom');
+            if (Utils.isEmpty(nom.value)) {
+                Utils.showError(nom, 'Le nom est obligatoire.');
+                valid = false;
+            } else if (nom.value.trim().length > 100) {
+                Utils.showError(nom, 'Maximum 100 caracteres.');
+                valid = false;
+            }
+
+            if (!valid) e.preventDefault();
+        });
+    },
+
+    initUser() {
+        const form = document.getElementById('formUser');
+        if (!form) return;
+
+        form.addEventListener('submit', function(e) {
+            Utils.clearAllErrors(this);
+            let valid = true;
+
+            const nom = this.querySelector('#nom');
+            const prenom = this.querySelector('#prenom');
+            const login = this.querySelector('#login');
+            const mdp = this.querySelector('#mot_de_passe');
+            const role = this.querySelector('#role');
+
+            if (Utils.isEmpty(nom.value)) {
+                Utils.showError(nom, 'Le nom est obligatoire.');
+                valid = false;
+            }
+            if (Utils.isEmpty(prenom.value)) {
+                Utils.showError(prenom, 'Le prenom est obligatoire.');
+                valid = false;
+            }
+            if (Utils.isEmpty(login.value)) {
+                Utils.showError(login, 'Le login est obligatoire.');
+                valid = false;
+            } else if (login.value.trim().length < 3) {
+                Utils.showError(login, 'Minimum 3 caracteres.');
+                valid = false;
+            }
+
+            if (mdp && !mdp.disabled) {
+                const isCreate = document.querySelector('[name="_mode"]')?.value !== 'modifier';
+                if (isCreate && Utils.isEmpty(mdp.value)) {
+                    Utils.showError(mdp, 'Le mot de passe est obligatoire.');
+                    valid = false;
+                } else if (!Utils.isEmpty(mdp.value) && mdp.value.trim().length < 6) {
+                    Utils.showError(mdp, 'Minimum 6 caracteres.');
+                    valid = false;
+                }
+            }
+
+            if (!role || role.value === '') {
+                Utils.showError(role, 'Selectionnez un role.');
+                valid = false;
+            }
+
+            if (!valid) e.preventDefault();
+        });
+    },
+
+    initDeleteConfirm() {
+        document.querySelectorAll('.confirm-delete').forEach(el => {
+            el.addEventListener('click', function(e) {
+                const msg = this.dataset.confirm || 'Supprimer cet element ?';
+                if (!confirm(msg)) e.preventDefault();
+            });
+        });
+    },
+
+    initInputClear() {
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('input', () => Utils.clearError(input));
+            input.addEventListener('change', () => Utils.clearError(input));
+        });
+    },
+
+    addCharCounter(input, max) {
+        if (!input) return;
+        
         const counter = document.createElement('small');
-        counter.style.cssText = 'color:#999;float:right;margin-top:.2rem;';
-        titreInput.parentElement.appendChild(counter);
-        const update = () => counter.textContent = `${titreInput.value.length}/255`;
-        titreInput.addEventListener('input', update);
+        counter.className = 'char-counter';
+        counter.style.cssText = 'color:#999;float:right;margin-top:.25rem;font-size:.75rem;';
+        input.parentElement.appendChild(counter);
+        
+        const update = () => {
+            const len = input.value.length;
+            counter.textContent = `${len}/${max}`;
+            counter.style.color = len > max ? 'var(--clr-danger)' : '#999';
+        };
+        
+        input.addEventListener('input', update);
         update();
     }
-}
+};
 
-/* ---- Formulaire Catégorie --------------------------------- */
-const formCategorie = document.getElementById('formCategorie');
-if (formCategorie) {
-    formCategorie.addEventListener('submit', function (e) {
-        clearAllErrors(this);
-        let valid = true;
+/* ============================================================
+   INITIALISATION
+   ============================================================ */
 
-        const nom = this.querySelector('#nom');
-        if (isEmpty(nom.value)) {
-            showError(nom, 'Le nom de la catégorie est obligatoire.');
-            valid = false;
-        } else if (nom.value.trim().length > 100) {
-            showError(nom, 'Le nom ne peut pas dépasser 100 caractères.');
-            valid = false;
-        }
-
-        if (!valid) e.preventDefault();
-    });
-}
-
-/* ---- Formulaire Utilisateur ------------------------------- */
-const formUser = document.getElementById('formUser');
-if (formUser) {
-    formUser.addEventListener('submit', function (e) {
-        clearAllErrors(this);
-        let valid = true;
-
-        const nom    = this.querySelector('#nom');
-        const prenom = this.querySelector('#prenom');
-        const login  = this.querySelector('#login');
-        const mdp    = this.querySelector('#mot_de_passe');
-        const role   = this.querySelector('#role');
-
-        if (isEmpty(nom.value)) {
-            showError(nom, 'Le nom est obligatoire.'); valid = false;
-        }
-        if (isEmpty(prenom.value)) {
-            showError(prenom, 'Le prénom est obligatoire.'); valid = false;
-        }
-        if (isEmpty(login.value)) {
-            showError(login, 'Le login est obligatoire.'); valid = false;
-        } else if (login.value.trim().length < 3) {
-            showError(login, 'Le login doit contenir au moins 3 caractères.'); valid = false;
-        }
-
-        // Mot de passe : obligatoire seulement à la création (input non disabled)
-        if (mdp && !mdp.disabled) {
-            const isCreate = document.querySelector('[name="_mode"]')?.value !== 'modifier';
-            if (isCreate && isEmpty(mdp.value)) {
-                showError(mdp, 'Le mot de passe est obligatoire.'); valid = false;
-            } else if (!isEmpty(mdp.value) && mdp.value.trim().length < 6) {
-                showError(mdp, 'Le mot de passe doit contenir au moins 6 caractères.'); valid = false;
-            }
-        }
-
-        if (!role || role.value === '') {
-            showError(role, 'Veuillez sélectionner un rôle.'); valid = false;
-        }
-
-        if (!valid) e.preventDefault();
-    });
-}
-
-/* ---- Confirmation suppression ----------------------------- */
-document.querySelectorAll('.confirm-delete').forEach(el => {
-    el.addEventListener('click', function (e) {
-        const msg = this.dataset.confirm || 'Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.';
-        if (!confirm(msg)) e.preventDefault();
-    });
-});
-
-/* ---- Effacement des erreurs à la saisie ------------------- */
-document.querySelectorAll('input, select, textarea').forEach(input => {
-    input.addEventListener('input', () => clearError(input));
-    input.addEventListener('change', () => clearError(input));
+document.addEventListener('DOMContentLoaded', () => {
+    FormValidation.init();
+    ImageUpload.init();
 });

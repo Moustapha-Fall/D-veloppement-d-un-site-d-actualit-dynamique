@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </nav>
 
     <div class="form-card mt-2">
-        <h2>✏ Modifier l'article</h2>
+        <h2>Modifier l'article</h2>
 
         <?php foreach ($erreurs as $err): ?>
             <div class="alert alert-danger"><?= htmlspecialchars($err) ?></div>
@@ -127,17 +127,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </select>
             </div>
             <div class="form-group">
-                <label for="image">Changer l'image (optionnel)</label>
-                <?php if ($article['image']): ?>
-                    <p style="font-size:.85rem;color:var(--clr-text-muted);margin-bottom:.3rem;">
-                        Image actuelle : <code><?= htmlspecialchars($article['image']) ?></code>
-                    </p>
+                <label>Image</label>
+                <?php if ($article['image'] && file_exists('../uploads/' . $article['image'])): ?>
+                    <div class="current-image">
+                        <img src="../uploads/<?= htmlspecialchars($article['image']) ?>" alt="Image actuelle">
+                        <div class="current-image-info">
+                            <div class="current-image-label">Image actuelle</div>
+                            <div class="current-image-name"><?= htmlspecialchars($article['image']) ?></div>
+                        </div>
+                    </div>
                 <?php endif; ?>
-                <input type="file" id="image" name="image" accept="image/*">
+                <div class="upload-zone">
+                    <div class="upload-zone-icon">+</div>
+                    <div class="upload-zone-text"><?= $article['image'] ? 'Changer l\'image' : 'Ajouter une image' ?></div>
+                    <div class="upload-zone-hint">JPG, PNG, WebP, GIF - Max 2 Mo</div>
+                    <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp,image/gif">
+                </div>
+                <div class="upload-preview">
+                    <img src="" alt="Apercu">
+                    <div class="upload-preview-info">
+                        <span class="upload-preview-name"></span>
+                        <span class="upload-preview-size"></span>
+                        <button type="button" class="upload-preview-remove">Supprimer</button>
+                    </div>
+                </div>
             </div>
 
             <div class="d-flex gap-1 flex-wrap">
-                <button type="submit" class="btn btn-success">💾 Enregistrer les modifications</button>
+                <button type="submit" class="btn btn-success">Enregistrer</button>
                 <a href="../article.php?id=<?= $id ?>" class="btn btn-outline">Annuler</a>
             </div>
         </form>

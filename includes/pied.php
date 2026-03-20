@@ -4,11 +4,10 @@
 <footer class="site-footer">
     <div class="footer-inner">
         <div class="footer-brand">
-            <span class="logo-icon">📰</span>
-            <strong>ActuSénégal</strong>
+            <strong>ActuSenegal</strong>
         </div>
-        <p class="footer-copy">&copy; <?= date('Y') ?> ActuSénégal — ESP Dakar, Projet Backend PHP/MySQL</p>
-        <p class="footer-tech">Développé avec PHP · MySQL · JavaScript</p>
+        <p class="footer-copy">&copy; <?= date('Y') ?> ActuSenegal - ESP Dakar</p>
+        <p class="footer-tech">PHP / MySQL / JavaScript</p>
     </div>
 </footer>
 

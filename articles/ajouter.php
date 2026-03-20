@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </nav>
 
     <div class="form-card mt-2">
-        <h2>✍ Nouvel article</h2>
+        <h2>Nouvel article</h2>
 
         <?php foreach ($erreurs as $err): ?>
             <div class="alert alert-danger"><?= htmlspecialchars($err) ?></div>
@@ -128,12 +128,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </select>
             </div>
             <div class="form-group">
-                <label for="image">Image (optionnel — jpg, png, webp, gif, max 2 Mo)</label>
-                <input type="file" id="image" name="image" accept="image/*">
+                <label>Image (optionnel)</label>
+                <div class="upload-zone">
+                    <div class="upload-zone-icon">+</div>
+                    <div class="upload-zone-text">Cliquez ou glissez une image ici</div>
+                    <div class="upload-zone-hint">JPG, PNG, WebP, GIF - Max 2 Mo</div>
+                    <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp,image/gif">
+                </div>
+                <div class="upload-preview">
+                    <img src="" alt="Apercu">
+                    <div class="upload-preview-info">
+                        <span class="upload-preview-name"></span>
+                        <span class="upload-preview-size"></span>
+                        <button type="button" class="upload-preview-remove">Supprimer</button>
+                    </div>
+                </div>
             </div>
 
             <div class="d-flex gap-1 flex-wrap">
-                <button type="submit" class="btn btn-primary">✅ Publier l'article</button>
+                <button type="submit" class="btn btn-primary">Publier</button>
                 <a href="../accueil.php" class="btn btn-outline">Annuler</a>
             </div>
         </form>

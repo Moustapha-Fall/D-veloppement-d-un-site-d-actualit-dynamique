@@ -62,10 +62,10 @@ $titre_page = $article['titre'];
         <!-- Titre -->
         <h1><?= htmlspecialchars($article['titre']) ?></h1>
 
-        <!-- Méta -->
+        <!-- Meta -->
         <div class="article-meta">
-            <span>✍ <?= htmlspecialchars($article['prenom'] . ' ' . $article['auteur_nom']) ?></span>
-            <span>🕒 <?= date('d/m/Y à H:i', strtotime($article['date_publication'])) ?></span>
+            <span><?= htmlspecialchars($article['prenom'] . ' ' . $article['auteur_nom']) ?></span>
+            <span><?= date('d/m/Y a H:i', strtotime($article['date_publication'])) ?></span>
         </div>
 
         <!-- Résumé -->
@@ -90,19 +90,19 @@ $titre_page = $article['titre'];
             ?>
         </div>
 
-        <!-- Boutons éditeur -->
+        <!-- Boutons editeur -->
         <?php if (isset($_SESSION['user_id'])): ?>
             <div class="d-flex gap-1 mt-3" style="border-top:1px solid var(--clr-border);padding-top:1rem;">
                 <a href="articles/modifier.php?id=<?= (int)$article['id'] ?>"
-                   class="btn btn-secondary">✏ Modifier cet article</a>
+                   class="btn btn-secondary">Modifier</a>
                 <a href="articles/supprimer.php?id=<?= (int)$article['id'] ?>"
                    class="btn btn-danger confirm-delete"
-                   data-confirm="Supprimer cet article ?">🗑 Supprimer</a>
-                <a href="accueil.php" class="btn btn-outline">← Retour à l'accueil</a>
+                   data-confirm="Supprimer cet article ?">Supprimer</a>
+                <a href="accueil.php" class="btn btn-outline">Retour</a>
             </div>
         <?php else: ?>
             <div class="mt-3">
-                <a href="accueil.php" class="btn btn-outline">← Retour à l'accueil</a>
+                <a href="accueil.php" class="btn btn-outline">Retour</a>
             </div>
         <?php endif; ?>
     </article>
