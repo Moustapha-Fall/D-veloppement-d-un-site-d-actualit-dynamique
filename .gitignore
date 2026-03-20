@@ -1,0 +1,16 @@
+# Ne JAMAIS envoyer le fichier de configuration sur GitHub
+config/db.php
+
+# Fichiers uploadés par les utilisateurs
+uploads/*
+!uploads/.gitkeep
+
+# Fichiers systèmes
+.DS_Store
+Thumbs.db
+*.log
+
+# Dossiers IDE
+.vscode/
+.idea/
+*.swp
