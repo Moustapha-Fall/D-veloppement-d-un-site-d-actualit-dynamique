@@ -5,21 +5,21 @@
 
 /* ---- Variables & Reset ------------------------------------ */
 :root {
-    --clr-primary:    #1a1a2e;
-    --clr-accent:     #e94560;
-    --clr-accent-2:   #0f3460;
-    --clr-bg:         #f8f9fa;
+    --clr-primary:    #0052cc;
+    --clr-accent:     #0052cc;
+    --clr-accent-2:   #003d99;
+    --clr-bg:         #f5f7fa;
     --clr-bg-card:    #ffffff;
-    --clr-text:       #1a1a2e;
-    --clr-text-muted: #6c757d;
-    --clr-border:     #e9ecef;
+    --clr-text:       #1a1a1a;
+    --clr-text-muted: #666666;
+    --clr-border:     #e0e0e0;
     --clr-success:    #198754;
     --clr-danger:     #dc3545;
     --clr-warning:    #ffc107;
-    --clr-info:       #0dcaf0;
+    --clr-info:       #0052cc;
     --radius:         10px;
-    --shadow-sm:      0 2px 8px rgba(0,0,0,.07);
-    --shadow-md:      0 8px 24px rgba(0,0,0,.12);
+    --shadow-sm:      0 2px 8px rgba(0,82,204,.08);
+    --shadow-md:      0 8px 24px rgba(0,82,204,.12);
     --transition:     .2s ease;
     --font-body:      'Inter', sans-serif;
     --font-heading:   'Playfair Display', Georgia, serif;
@@ -257,7 +257,7 @@ a:hover { opacity: .8; }
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none; border-color: var(--clr-accent);
-    box-shadow: 0 0 0 3px rgba(233,69,96,.12);
+    box-shadow: 0 0 0 3px rgba(0,82,204,.12);
     background: #fff;
 }
 .form-group textarea { min-height: 130px; resize: vertical; }
@@ -281,7 +281,7 @@ a:hover { opacity: .8; }
 .upload-zone:hover,
 .upload-zone.dragover {
     border-color: var(--clr-accent);
-    background: rgba(233,69,96,.05);
+    background: rgba(0,82,204,.05);
 }
 .upload-zone input[type="file"] {
     position: absolute;
