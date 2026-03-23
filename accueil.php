@@ -6,55 +6,56 @@ require_once 'includes/entete.php';
 require_once 'config/db.php';
 require_once 'includes/menu.php';
 
-// --- Paramètres de pagination ---
-$par_page = 6;
+// --- Paramètres ---
+$par_page      = 6;
 $page_courante = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-$offset = ($page_courante - 1) * $par_page;
+$filtre_cat    = isset($_GET['categorie']) ? (int)$_GET['categorie'] : 0;
+$recherche     = isset($_GET['recherche']) ? trim($_GET['recherche']) : '';
+$search_like   = '%' . $recherche . '%';
 
-// Filtre par catégorie (optionnel)
-$filtre_cat = isset($_GET['categorie']) ? (int)$_GET['categorie'] : 0;
+// --- Construction du WHERE ---
+$where_parts  = [];
+$count_params = [];
+$list_params  = [];
 
-// --- Comptage total des articles ---
 if ($filtre_cat > 0) {
-    $stmt = $pdo->prepare('SELECT COUNT(*) FROM articles WHERE categorie_id = ?');
-    $stmt->execute([$filtre_cat]);
-} else {
-    $stmt = $pdo->query('SELECT COUNT(*) FROM articles');
+    $where_parts[]  = 'a.categorie_id = ?';
+    $count_params[] = $filtre_cat;
+    $list_params[]  = $filtre_cat;
 }
+if ($recherche !== '') {
+    $where_parts[] = '(a.titre LIKE ? OR a.description LIKE ? OR a.contenu LIKE ?)';
+    for ($i = 0; $i < 3; $i++) { $count_params[] = $search_like; }
+    for ($i = 0; $i < 3; $i++) { $list_params[]  = $search_like; }
+}
+$where_sql = $where_parts ? 'WHERE ' . implode(' AND ', $where_parts) : '';
+
+// --- Comptage total ---
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM articles a JOIN categories c ON a.categorie_id = c.id $where_sql");
+$stmt->execute($count_params);
 $total_articles = (int)$stmt->fetchColumn();
 $total_pages    = max(1, (int)ceil($total_articles / $par_page));
 $page_courante  = min($page_courante, $total_pages);
+$offset         = ($page_courante - 1) * $par_page;
 
-// --- Récupération des articles avec JOIN ---
-if ($filtre_cat > 0) {
-    $stmt = $pdo->prepare('
-        SELECT a.id, a.titre, a.description, a.date_publication, a.image,
-               c.nom AS categorie_nom, c.id AS categorie_id,
-               u.prenom, u.nom AS auteur_nom
-        FROM articles a
-        JOIN categories c ON a.categorie_id = c.id
-        JOIN utilisateurs u ON a.auteur_id = u.id
-        WHERE a.categorie_id = ?
-        ORDER BY a.date_publication DESC
-        LIMIT ? OFFSET ?
-    ');
-    $stmt->execute([$filtre_cat, $par_page, $offset]);
-} else {
-    $stmt = $pdo->prepare('
-        SELECT a.id, a.titre, a.description, a.date_publication, a.image,
-               c.nom AS categorie_nom, c.id AS categorie_id,
-               u.prenom, u.nom AS auteur_nom
-        FROM articles a
-        JOIN categories c ON a.categorie_id = c.id
-        JOIN utilisateurs u ON a.auteur_id = u.id
-        ORDER BY a.date_publication DESC
-        LIMIT ? OFFSET ?
-    ');
-    $stmt->execute([$par_page, $offset]);
-}
+// --- Récupération des articles ---
+$list_params[] = $par_page;
+$list_params[] = $offset;
+$stmt = $pdo->prepare("
+    SELECT a.id, a.titre, a.description, a.date_publication, a.image,
+           c.nom AS categorie_nom, c.id AS categorie_id,
+           u.prenom, u.nom AS auteur_nom
+    FROM articles a
+    JOIN categories c ON a.categorie_id = c.id
+    JOIN utilisateurs u ON a.auteur_id = u.id
+    $where_sql
+    ORDER BY a.date_publication DESC
+    LIMIT ? OFFSET ?
+");
+$stmt->execute($list_params);
 $articles = $stmt->fetchAll();
 
-// --- Récupération des catégories pour le filtre ---
+// --- Catégories pour le filtre ---
 $categories = $pdo->query('SELECT id, nom FROM categories ORDER BY nom')->fetchAll();
 
 // Nom de la catégorie filtrée (pour affichage)
@@ -72,6 +73,32 @@ if ($filtre_cat > 0) {
 </div>
 
 <div class="container">
+
+    <!-- Barre de recherche -->
+    <div class="search-wrapper mt-3">
+        <form class="search-bar" method="GET" action="accueil.php" role="search">
+            <?php if ($filtre_cat > 0): ?>
+                <input type="hidden" name="categorie" value="<?= $filtre_cat ?>">
+            <?php endif; ?>
+            <span class="search-bar-icon">&#128269;</span>
+            <input type="text" class="search-bar-input" name="recherche"
+                   value="<?= htmlspecialchars($recherche) ?>"
+                   placeholder="Rechercher un article…"
+                   autocomplete="off">
+            <?php if ($recherche !== ''): ?>
+                <a href="accueil.php<?= $filtre_cat ? '?categorie=' . $filtre_cat : '' ?>"
+                   class="search-bar-clear" title="Effacer">&#x2715;</a>
+            <?php endif; ?>
+            <button type="submit" class="search-bar-btn">Rechercher</button>
+        </form>
+    </div>
+
+    <?php if ($recherche !== ''): ?>
+        <div class="alert alert-info mt-2">
+            <?= $total_articles ?> résultat<?= $total_articles > 1 ? 's' : '' ?>
+            pour <strong>« <?= htmlspecialchars($recherche) ?> »</strong>
+        </div>
+    <?php endif; ?>
 
     <!-- Filtre catégories -->
     <div class="category-filter mt-3">

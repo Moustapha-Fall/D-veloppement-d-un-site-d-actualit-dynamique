@@ -7,8 +7,7 @@
             <span class="logo-icon">📰</span>
             <strong>ActuSénégal</strong>
         </div>
-        <p class="footer-copy">&copy; <?= date('Y') ?> ActuSénégal — ESP Dakar, Projet Backend PHP/MySQL</p>
-        <p class="footer-tech">Développé avec PHP · MySQL · JavaScript</p>
+        <p class="footer-copy">&copy; <?= date('Y') ?> ActuSénégal — ESP Dakar</p>
     </div>
 </footer>
 

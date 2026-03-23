@@ -83,12 +83,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="accueil.php">← Retour à l'accueil sans connexion</a>
         </div>
 
-        <!-- Aide mémoire pour les tests (à supprimer en production) -->
-        <div class="alert alert-info mt-2" style="font-size:.8rem;">
-            <strong>Comptes de test :</strong><br>
-            Admin : <code>admin</code> / <code>password</code><br>
-            Éditeur : <code>editeur</code> / <code>password</code>
-        </div>
     </div>
 </div>
 

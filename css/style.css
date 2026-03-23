@@ -313,6 +313,41 @@ tbody tr:hover { background: var(--clr-bg); }
 td { padding: .85rem 1rem; font-size: .9rem; vertical-align: middle; }
 td .actions { display: flex; gap: .4rem; }
 
+/* ---- Barre de recherche ----------------------------------- */
+.search-wrapper { width: 100%; }
+.search-bar {
+    display: flex; align-items: center; gap: .5rem;
+    background: var(--clr-bg-card); border: 1.5px solid var(--clr-border);
+    border-radius: 30px; padding: .4rem .5rem .4rem 1rem;
+    box-shadow: var(--shadow-sm);
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+.search-bar:focus-within {
+    border-color: var(--clr-accent);
+    box-shadow: 0 0 0 3px rgba(233,69,96,.1);
+}
+.search-bar-icon { color: var(--clr-text-muted); font-size: 1rem; flex-shrink: 0; }
+.search-bar-input {
+    flex: 1; border: none; background: transparent;
+    font-size: .95rem; font-family: var(--font-body); color: var(--clr-text);
+    outline: none; min-width: 0;
+}
+.search-bar-input::placeholder { color: var(--clr-text-muted); }
+.search-bar-clear {
+    color: var(--clr-text-muted); font-size: .85rem; padding: .2rem .4rem;
+    border-radius: 50%; transition: background var(--transition);
+    flex-shrink: 0;
+}
+.search-bar-clear:hover { background: var(--clr-bg); color: var(--clr-danger); opacity:1; }
+.search-bar-btn {
+    background: var(--clr-accent); color: #fff;
+    border: none; border-radius: 24px; padding: .45rem 1.1rem;
+    font-size: .88rem; font-weight: 600; font-family: var(--font-body);
+    cursor: pointer; flex-shrink: 0;
+    transition: background var(--transition);
+}
+.search-bar-btn:hover { background: #c73652; }
+
 /* ---- Connexion page --------------------------------------- */
 .login-wrapper {
     min-height: calc(100vh - var(--header-h));
@@ -321,7 +356,7 @@ td .actions { display: flex; gap: .4rem; }
     padding: 2rem 1rem;
 }
 .login-card { background: #fff; border-radius: 16px; box-shadow: var(--shadow-md);
-    padding: 2.5rem; width: 100%; max-width: 420px; }
+    padding: 2.5rem; width: 100%; max-width: 420px; overflow: hidden; word-break: break-word; }
 .login-card h2 { font-family: var(--font-heading); font-size: 1.8rem; margin-bottom: .5rem;
     color: var(--clr-primary); }
 .login-card .subtitle { color: var(--clr-text-muted); margin-bottom: 1.5rem; font-size: .9rem; }
