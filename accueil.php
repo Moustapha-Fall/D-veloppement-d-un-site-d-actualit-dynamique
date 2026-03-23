@@ -55,8 +55,17 @@ $stmt = $pdo->prepare("
 $stmt->execute($list_params);
 $articles = $stmt->fetchAll();
 
-// --- Catégories pour le filtre ---
-$categories = $pdo->query('SELECT id, nom FROM categories ORDER BY nom')->fetchAll();
+// --- Catégories avec nombre d'articles ---
+$categories = $pdo->query('
+    SELECT c.id, c.nom, COUNT(a.id) AS nb_articles
+    FROM categories c
+    LEFT JOIN articles a ON a.categorie_id = c.id
+    GROUP BY c.id
+    ORDER BY c.nom
+')->fetchAll();
+
+// Total général (toutes catégories)
+$total_general = (int)$pdo->query('SELECT COUNT(*) FROM articles')->fetchColumn();
 
 // Nom de la catégorie filtrée (pour affichage)
 $nom_filtre = '';
@@ -100,13 +109,21 @@ if ($filtre_cat > 0) {
         </div>
     <?php endif; ?>
 
-    <!-- Filtre catégories -->
+    <!-- Filtre catégories avec compteurs -->
     <div class="category-filter mt-3">
-        <a href="accueil.php" class="<?= $filtre_cat === 0 ? 'active' : '' ?>">Toutes</a>
+        <a href="accueil.php<?= $recherche ? '?recherche=' . urlencode($recherche) : '' ?>"
+           class="<?= $filtre_cat === 0 ? 'active' : '' ?>">
+            Toutes <span class="cat-count"><?= $total_general ?></span>
+        </a>
         <?php foreach ($categories as $cat): ?>
-            <a href="accueil.php?categorie=<?= $cat['id'] ?>"
+            <?php
+            $href = '?categorie=' . (int)$cat['id'];
+            if ($recherche !== '') $href .= '&recherche=' . urlencode($recherche);
+            ?>
+            <a href="accueil.php<?= $href ?>"
                class="<?= $filtre_cat == $cat['id'] ? 'active' : '' ?>">
                 <?= htmlspecialchars($cat['nom']) ?>
+                <span class="cat-count"><?= (int)$cat['nb_articles'] ?></span>
             </a>
         <?php endforeach; ?>
     </div>
@@ -173,21 +190,32 @@ if ($filtre_cat > 0) {
             <?php endforeach; ?>
         </div>
 
-        <!-- Pagination -->
+        <!-- Pagination avancée -->
         <?php if ($total_pages > 1): ?>
-            <div class="pagination">
-                <?php
-                $qs = $filtre_cat ? "&categorie=$filtre_cat" : '';
-                ?>
-                <!-- Bouton Précédent -->
-                <?php if ($page_courante > 1): ?>
-                    <a href="?page=<?= $page_courante - 1 . $qs ?>">&laquo; Précédent</a>
-                <?php else: ?>
-                    <span class="disabled">&laquo; Précédent</span>
+            <?php
+            $qs = '';
+            if ($filtre_cat)    $qs .= '&categorie=' . $filtre_cat;
+            if ($recherche !== '') $qs .= '&recherche=' . urlencode($recherche);
+            $fenetre = 2;
+            $p_debut = max(1, $page_courante - $fenetre);
+            $p_fin   = min($total_pages, $page_courante + $fenetre);
+            ?>
+            <nav class="pagination" aria-label="Pagination">
+                <!-- Première page -->
+                <?php if ($p_debut > 1): ?>
+                    <a href="?page=1<?= $qs ?>">1</a>
+                    <?php if ($p_debut > 2): ?><span class="pagination-ellipsis">…</span><?php endif; ?>
                 <?php endif; ?>
 
-                <!-- Numéros de pages -->
-                <?php for ($p = 1; $p <= $total_pages; $p++): ?>
+                <!-- Précédent -->
+                <?php if ($page_courante > 1): ?>
+                    <a href="?page=<?= $page_courante - 1 . $qs ?>">&laquo;</a>
+                <?php else: ?>
+                    <span class="disabled">&laquo;</span>
+                <?php endif; ?>
+
+                <!-- Numéros fenêtre glissante -->
+                <?php for ($p = $p_debut; $p <= $p_fin; $p++): ?>
                     <?php if ($p === $page_courante): ?>
                         <span class="current"><?= $p ?></span>
                     <?php else: ?>
@@ -195,13 +223,19 @@ if ($filtre_cat > 0) {
                     <?php endif; ?>
                 <?php endfor; ?>
 
-                <!-- Bouton Suivant -->
+                <!-- Suivant -->
                 <?php if ($page_courante < $total_pages): ?>
-                    <a href="?page=<?= $page_courante + 1 . $qs ?>">Suivant &raquo;</a>
+                    <a href="?page=<?= $page_courante + 1 . $qs ?>">&raquo;</a>
                 <?php else: ?>
-                    <span class="disabled">Suivant &raquo;</span>
+                    <span class="disabled">&raquo;</span>
                 <?php endif; ?>
-            </div>
+
+                <!-- Dernière page -->
+                <?php if ($p_fin < $total_pages): ?>
+                    <?php if ($p_fin < $total_pages - 1): ?><span class="pagination-ellipsis">…</span><?php endif; ?>
+                    <a href="?page=<?= $total_pages . $qs ?>"><?= $total_pages ?></a>
+                <?php endif; ?>
+            </nav>
             <p class="text-center text-muted" style="font-size:.85rem;margin-bottom:1rem;">
                 Page <?= $page_courante ?> sur <?= $total_pages ?>
                 (<?= $total_articles ?> article<?= $total_articles > 1 ? 's' : '' ?>)

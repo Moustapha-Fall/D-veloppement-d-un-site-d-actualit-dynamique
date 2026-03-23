@@ -234,6 +234,16 @@ a:hover { opacity: .8; }
 .category-filter a:hover, .category-filter a.active {
     background: var(--clr-accent); color: #fff; border-color: var(--clr-accent); opacity:1;
 }
+.cat-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.1); color: inherit;
+    font-size: .7rem; font-weight: 700;
+    min-width: 18px; height: 18px; padding: 0 5px;
+    border-radius: 10px; margin-left: .3rem;
+}
+.category-filter a.active .cat-count { background: rgba(255,255,255,.25); }
+.pagination-ellipsis { border: none !important; background: transparent !important;
+    box-shadow: none !important; color: var(--clr-text-muted); }
 
 /* ---- Formulaires ------------------------------------------ */
 .form-page { max-width: 600px; margin: 2rem auto; }
