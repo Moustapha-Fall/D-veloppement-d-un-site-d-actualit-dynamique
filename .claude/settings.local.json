@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mysql -u root -pmESen28@ actualite_db -e \"SELECT id, nom, prenom, login, role, created_at FROM utilisateurs;\")"
+    ]
+  }
+}

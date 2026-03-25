@@ -61,16 +61,22 @@ INSERT INTO categories (nom, description) VALUES
 ('Culture',      'Arts, cinema, musique et patrimoine');
 
 -- Compte administrateur
--- Mot de passe : Admin2024! (hash bcrypt genere avec password_hash)
+-- Mot de passe : Junior04
 INSERT INTO utilisateurs (nom, prenom, login, mot_de_passe, role) VALUES
-('Ndiaye', 'Mohamed Mbaye', 'admin',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+('Ndiaye', 'Mohamed Mbaye', 'Mohamed',
+ '$2y$12$wEUnx6oSIkGuJ2ndSZZ7L.J.rs0/0t8iNNYT7FWOE4fosMzjL5AGm', 'admin');
 
--- Compte editeur de test
--- Mot de passe : Editeur2024!
+-- Compte editeur 1
+-- Mot de passe : password
 INSERT INTO utilisateurs (nom, prenom, login, mot_de_passe, role) VALUES
-('Ndoye', 'Cheikh Ahmed Tidjane', 'editeur',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'editeur');
+('Ndoye', 'Cheikh Ahmed Tidjane Cherif', 'Cheikh_ndoye',
+ '$2y$12$AL52.fpMpWOq8SfepP8o1edUg0WF.SVWKSv2vhVWoZTtp7XCeHiQC', 'editeur');
+
+-- Compte editeur 2
+-- Mot de passe : password
+INSERT INTO utilisateurs (nom, prenom, login, mot_de_passe, role) VALUES
+('Fall', 'Moustapha', 'moustapha',
+ '$2y$12$AL52.fpMpWOq8SfepP8o1edUg0WF.SVWKSv2vhVWoZTtp7XCeHiQC', 'editeur');
 
 -- Articles de test pour peupler la page d'accueil
 INSERT INTO articles (titre, description, contenu, categorie_id, auteur_id) VALUES
