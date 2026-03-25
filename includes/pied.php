@@ -4,7 +4,6 @@
 <footer class="site-footer">
     <div class="footer-inner">
         <div class="footer-brand">
-            <span class="logo-icon">📰</span>
             <strong>ActuSénégal</strong>
         </div>
         <p class="footer-copy">&copy; <?= date('Y') ?> ActuSénégal — ESP Dakar</p>

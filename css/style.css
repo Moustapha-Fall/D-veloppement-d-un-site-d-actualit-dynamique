@@ -47,7 +47,7 @@ a:hover { opacity: .8; }
 /* ---- Header ----------------------------------------------- */
 .site-header {
     position: sticky; top: 0; z-index: 1000;
-    background: var(--clr-primary);
+    background: var(--clr-accent-2);
     box-shadow: var(--shadow-md);
     height: var(--header-h);
 }
@@ -147,7 +147,7 @@ a:hover { opacity: .8; }
 
 /* ---- Hero / Page header ----------------------------------- */
 .page-hero {
-    background: linear-gradient(135deg, var(--clr-primary), var(--clr-accent-2));
+    background: var(--clr-accent-2);
     color: #fff; padding: 3rem 1.5rem; text-align: center;
 }
 .page-hero h1 { font-family: var(--font-heading); font-size: 2.4rem; margin-bottom: .5rem; }
@@ -362,7 +362,7 @@ td .actions { display: flex; gap: .4rem; }
 .login-wrapper {
     min-height: calc(100vh - var(--header-h));
     display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, var(--clr-primary) 0%, var(--clr-accent-2) 100%);
+    background: linear-gradient(135deg, var(--clr-accent-2) 100%);
     padding: 2rem 1rem;
 }
 .login-card { background: #fff; border-radius: 16px; box-shadow: var(--shadow-md);
@@ -383,7 +383,7 @@ td .actions { display: flex; gap: .4rem; }
 .empty-state h3 { font-size: 1.2rem; color: var(--clr-text); margin-bottom: .5rem; }
 
 /* ---- Footer ----------------------------------------------- */
-.site-footer { background: var(--clr-primary); color: rgba(255,255,255,.7);
+.site-footer { background: var(--clr-accent-2); color: rgba(255,255,255,.7);
     padding: 2rem 1.5rem; margin-top: auto; }
 .footer-inner { max-width: 1200px; margin: 0 auto; text-align: center; }
 .footer-brand { display: flex; align-items: center; justify-content: center; gap: .4rem;

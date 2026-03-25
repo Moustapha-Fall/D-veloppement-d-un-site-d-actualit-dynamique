@@ -77,7 +77,7 @@ if ($filtre_cat > 0) {
 ?>
 
 <div class="page-hero">
-    <h1>📰 ActuSénégal</h1>
+    <h1>ActuSénégal</h1>
     <p>L'actualité en temps réel — Technologie, Sport, Politique, Education, Culture</p>
 </div>
 
